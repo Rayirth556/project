@@ -1,0 +1,42 @@
+# ─── Large Datasets (never commit raw data) ────────────────────────────────
+*.csv
+*.tsv
+*.parquet
+
+# ─── Trained Models & Binary Artifacts ─────────────────────────────────────
+*.json
+*.bin
+*.pkl
+*.pickle
+*.joblib
+*.h5
+*.pt
+*.pth
+
+# ─── Python Cache ───────────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# ─── Virtual Environments ───────────────────────────────────────────────────
+.venv/
+venv/
+env/
+.env
+
+# ─── IDE / Editor ───────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.suo
+*.user
+
+# ─── OS Artifacts ───────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ─── Logs & Temp ────────────────────────────────────────────────────────────
+*.log
+error_log.*
+*.tmp

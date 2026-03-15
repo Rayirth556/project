@@ -1,3 +1,7 @@
 requests
 pandas
+numpy
 networkx
+scikit-learn
+xgboost
+shap

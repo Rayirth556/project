@@ -1,6 +1,8 @@
 import time
 import json
 import logging
+import pandas as pd
+import requests
 from datetime import datetime, timedelta, timezone
 from setu_connector import SetuAAConnector
 from normalizer import flatten_aa_json
@@ -191,9 +193,9 @@ def orchestrate_live_pipeline():
         df.to_csv(csv_path, index=False)
         print(f"\n[INFO] Artifacts archived to {csv_path}")
 
-    except Exception as e:
+    except requests.exceptions.RequestException as e:
         print(f"\n[CRITICAL ERROR] Pipeline execution fractured: {e}")
-        if hasattr(e, 'response') and e.response is not None:
+        if e.response is not None:
             print("Underlying Exception Traces:")
             print(e.response.text)
 

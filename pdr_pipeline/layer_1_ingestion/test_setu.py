@@ -1,5 +1,6 @@
 import logging
 import json
+import requests
 from datetime import datetime, timedelta, timezone
 from setu_connector import SetuAAConnector
 
@@ -50,8 +51,9 @@ def run_consent_test():
         "redirectUrl": "https://your-app-dashboard.com/success"
     }
 
+    fi_types: list = payload['fiTypes']  # type: ignore[assignment]
     print("\n--- STARTING SETU CONSENT TEST ---")
-    print(f"Requesting '{payload['fiTypes'][0]}' data from: {data_fetch_start} to {data_fetch_end}")
+    print(f"Requesting '{fi_types[0]}' data from: {data_fetch_start} to {data_fetch_end}")
 
     # 4. Make the request to Setu
     try:
@@ -72,9 +74,9 @@ def run_consent_test():
             print(f"3. Note down this Consent ID for the next step: {consent_id}")
             print(f"=======================================================\n")
             
-    except Exception as e:
+    except requests.exceptions.RequestException as e:
         print(f"\n[ERROR] FAILED TO CREATE CONSENT")
-        if hasattr(e, 'response') and e.response is not None:
+        if e.response is not None:
             print("Response error:", e.response.text)
         print(f"Check your Client ID and Client Secret in setu_connector.py.")
 

@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 import json
+from typing import Optional
 
 class FeatureStoreMSME:
     """
@@ -10,7 +11,7 @@ class FeatureStoreMSME:
     a comprehensive Feature Vector of 50+ markers across 6 strategic pillars.
     """
     
-    def __init__(self, aa_data: pd.DataFrame, ui_data: dict, config: dict = None):
+    def __init__(self, aa_data: pd.DataFrame, ui_data: dict, config: Optional[dict] = None):
         """
         :param aa_data: DataFrame from Layer 1 standardized CSV.
         :param ui_data: Dictionary containing fields from the UI form.
@@ -348,18 +349,14 @@ class FeatureStoreMSME:
         col = 'Counterparty' if 'Counterparty' in self.aa_data.columns else 'Category'
         
         for _, row in self.aa_data.iterrows():
-            if 'nameOrig' in row and 'nameDest' in row:
-                # If PaySim logic is explicitly provided with actual nodes
-                G.add_edge(str(row['nameOrig']), str(row['nameDest']), weight=row['Amount'])
-            else:
-                cp = str(row.get(col, 'Unknown'))
-                txn_type = str(row['Transaction_Type']).upper()
-                amt = row['Amount']
-                
-                if txn_type == 'CREDIT':
-                    G.add_edge(cp, target_account, weight=amt)
-                elif txn_type == 'DEBIT':
-                    G.add_edge(target_account, cp, weight=amt)
+            cp = str(row.get(col, 'Unknown'))
+            txn_type = str(row['Transaction_Type']).upper()
+            amt = row['Amount']
+
+            if txn_type == 'CREDIT':
+                G.add_edge(cp, target_account, weight=amt)
+            elif txn_type == 'DEBIT':
+                G.add_edge(target_account, cp, weight=amt)
                 
         try:
             cycles = list(nx.simple_cycles(G))

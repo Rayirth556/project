@@ -1,0 +1,12 @@
+{
+  "site_package_search_strategy": "pep561",
+  "source_directories": [
+    {"root": "."},
+    {"root": "pdr_pipeline"},
+    {"root": "pdr_pipeline/layer_1_ingestion"}
+  ],
+  "search_path": [
+    "C:\\Users\\rayir\\OneDrive\\Documents\\barclays_project\\.venv\\Lib\\site-packages"
+  ],
+  "python_version": "3.13"
+}
