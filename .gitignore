@@ -1,7 +1,7 @@
 # ─── Large Datasets (never commit raw data) ────────────────────────────────
 *.csv
 *.tsv
-/data/raw
+data/raw
 
 # ─── Trained Models & Binary Artifacts ─────────────────────────────────────
 *.json
