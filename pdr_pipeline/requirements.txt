@@ -1,0 +1,11 @@
+requests
+pandas
+numpy
+networkx
+scikit-learn
+xgboost
+shap
+optuna
+imbalanced-learn
+pyarrow
+fastparquet

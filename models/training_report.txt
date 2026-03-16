@@ -1,0 +1,47 @@
+PDR Pipeline - Layer 3 Training Report
+==================================================
+
+Model Path: C:\Users\kanis\OneDrive\Desktop\webseries\project\models\pdr_xgb_realworld.json
+Features: 31
+
+Metrics:
+  roc_auc: 0.6103
+  avg_precision: 0.1772
+  brier_score: 0.6185
+  n_train: 126680
+  n_test: 18000
+  default_rate_test: 0.1203
+  confusion_matrix: [[0, 15835], [0, 2165]]
+
+Classification Report:
+              precision    recall  f1-score   support
+
+  No Default       0.00      0.00      0.00     15835
+     Default       0.12      1.00      0.21      2165
+
+    accuracy                           0.12     18000
+   macro avg       0.06      0.50      0.11     18000
+weighted avg       0.01      0.12      0.03     18000
+
+
+Feature Importances (top 20):
+  cashflow_volatility: 0.331171
+  essential_vs_lifestyle_ratio: 0.144923
+  avg_utility_dpd: 0.102511
+  cash_withdrawal_dependency: 0.071773
+  subscription_commitment_ratio: 0.061769
+  bounced_transaction_count: 0.059433
+  operating_cashflow_ratio: 0.047515
+  avg_invoice_payment_delay: 0.047479
+  emergency_buffer_months: 0.042339
+  eod_balance_volatility: 0.039223
+  benford_anomaly_score: 0.034001
+  rent_wallet_share: 0.017863
+  utility_payment_consistency: 0.000000
+  min_balance_violation_count: 0.000000
+  telecom_number_vintage_days: 0.000000
+  telecom_recharge_drop_ratio: 0.000000
+  academic_background_tier: 0.000000
+  purpose_of_loan_encoded: 0.000000
+  business_vintage_months: 0.000000
+  revenue_growth_trend: 0.000000
