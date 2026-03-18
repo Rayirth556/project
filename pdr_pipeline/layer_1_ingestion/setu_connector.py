@@ -25,6 +25,54 @@ class SetuAAConnector:
             "Content-Type": "application/json"
         }
 
+    def set_base_url(self, base_url: str) -> None:
+        self.base_url = base_url.rstrip("/")
+
+    def _raise_for_status_with_body(self, resp: requests.Response) -> None:
+        try:
+            resp.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            body = ""
+            try:
+                body = resp.text
+            except Exception:
+                body = "<unable to read response body>"
+            logger.error(f"HTTP {resp.status_code} for {resp.request.method} {resp.url}\nResponse body: {body}")
+            raise e
+
+    def _request_with_fallback(self, method: str, endpoints: list[str], *, json: dict | None = None) -> dict:
+        """
+        Try multiple endpoints in order, returning the first successful JSON response.
+        Useful because Setu exposes different paths across environments/products.
+        """
+        last_exc: Exception | None = None
+        for endpoint in endpoints:
+            try:
+                resp = requests.request(method, endpoint, headers=self.headers, json=json)
+                self._raise_for_status_with_body(resp)
+                return resp.json()
+            except requests.exceptions.HTTPError as e:
+                last_exc = e
+                status = getattr(resp, "status_code", None)
+
+                # Only fall back when it looks like the endpoint/path is unsupported
+                # (or when credentials are scoped differently across variants).
+                if status in (404, 405):
+                    continue
+                if status in (401, 403):
+                    # Try the next endpoint variant if available.
+                    continue
+
+                # For "real" request errors (400, 409, 5xx, etc), don't mask the primary error
+                # by falling back to a different endpoint.
+                raise
+            except requests.exceptions.RequestException as e:
+                last_exc = e
+                continue
+        if last_exc:
+            raise last_exc
+        raise RuntimeError("No endpoints provided")
+
     def create_consent_request(self, payload: dict | None = None) -> dict:
         """
         Makes a POST request to the Setu Sandbox to generate a consent link.
@@ -39,7 +87,7 @@ class SetuAAConnector:
         
         try:
             response = requests.post(endpoint, headers=self.headers, json=payload)
-            response.raise_for_status()
+            self._raise_for_status_with_body(response)
             logger.info("Successfully created consent request.")
             return response.json()
         except requests.exceptions.RequestException as e:
@@ -55,7 +103,7 @@ class SetuAAConnector:
         
         try:
             response = requests.get(endpoint, headers=self.headers)
-            response.raise_for_status()
+            self._raise_for_status_with_body(response)
             return response.json()
         except requests.exceptions.RequestException as e:
             logger.error(f"Failed to fetch consent status for '{consent_id}': {e}")
@@ -65,35 +113,59 @@ class SetuAAConnector:
         """
         Creates a data session for an ACTIVE consent, enabling the fetching of actual FI data.
         """
-        endpoint = f"{self.base_url}/v2/sessions"
         logger.info(f"Creating data session for consent_id: {consent_id}")
         
         payload = {
             "consentId": consent_id,
-            "DataRange": data_range,
+            "dataRange": data_range,
             "format": "json"
         }
         
         try:
-            response = requests.post(endpoint, headers=self.headers, json=payload)
-            response.raise_for_status()
-            return response.json()
+            # Prefer v2 sessions (commonly used with Bridge-style credentials),
+            # fall back to legacy/non-v2 if the environment supports it.
+            return self._request_with_fallback(
+                "POST",
+                [
+                    f"{self.base_url}/v2/sessions",
+                    f"{self.base_url}/sessions",
+                ],
+                json=payload,
+            )
         except requests.exceptions.RequestException as e:
             logger.error(f"Failed to create data session: {e}")
             raise
 
+    def get_session_status(self, session_id: str) -> dict:
+        try:
+            return self._request_with_fallback(
+                "GET",
+                [
+                    f"{self.base_url}/v2/sessions/{session_id}",
+                    f"{self.base_url}/sessions/{session_id}",
+                ],
+            )
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Failed to check session status: {e}")
+            raise
+
     def fetch_fi_data(self, session_id: str) -> dict:
         """
-        Makes a GET request to retrieve the FI data (JSON stream) once consent is approved.
+        Fetches decrypted FI data for a data session.
+        Setu returns FI data on the same endpoint used for session status.
         """
-        endpoint = f"{self.base_url}/v2/sessions/{session_id}/fi/data"
         logger.info(f"Fetching FI data for session_id: {session_id}")
-        
+
         try:
-            response = requests.get(endpoint, headers=self.headers)
-            response.raise_for_status()
+            data = self._request_with_fallback(
+                "GET",
+                [
+                    f"{self.base_url}/v2/sessions/{session_id}",
+                    f"{self.base_url}/sessions/{session_id}",
+                ],
+            )
             logger.info(f"Successfully retrieved FI data for session_id: {session_id}.")
-            return response.json()
+            return data
         except requests.exceptions.RequestException as e:
             logger.error(f"Failed to fetch FI data for session_id '{session_id}': {e}")
             raise

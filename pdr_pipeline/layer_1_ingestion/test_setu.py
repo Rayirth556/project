@@ -20,7 +20,7 @@ def run_consent_test():
 
     # 3. Define the Consent Payload for Setu V2
     payload = {
-        "vua": "",
+        "vua": "9999999999@setu",
         "consentDuration": {
             "unit": "MONTH",
             "value": 1

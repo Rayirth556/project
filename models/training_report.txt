@@ -2,46 +2,56 @@ PDR Pipeline - Layer 3 Training Report
 ==================================================
 
 Model Path: C:\Users\kanis\OneDrive\Desktop\webseries\project\models\pdr_xgb_realworld.json
+Calibration Path: C:\Users\kanis\OneDrive\Desktop\webseries\project\models\pdr_xgb_realworld_calibration.json
+Feature Readiness Audit: C:\Users\kanis\OneDrive\Desktop\webseries\project\models\feature_readiness_audit.json
 Features: 31
 
 Metrics:
-  roc_auc: 0.6103
-  avg_precision: 0.1772
-  brier_score: 0.6185
-  n_train: 126680
-  n_test: 18000
-  default_rate_test: 0.1203
-  confusion_matrix: [[0, 15835], [0, 2165]]
+  roc_auc: 0.9931
+  avg_precision: 0.9803
+  brier_score: 0.0139
+  n_train: 6300
+  n_val: 1350
+  n_test: 1350
+  default_rate_test: 0.1119
+  confusion_matrix: [[1194, 5], [9, 142]]
+  threshold: 0.35
+  threshold_details: {'strategy': 'f05', 'threshold': 0.35000000000000003, 'f05': 0.9517601043024772}
+  precision: 0.966
+  recall: 0.9404
+  f1: 0.953
+  imbalance_mode: scale_pos_weight
+  calibration: platt
 
 Classification Report:
               precision    recall  f1-score   support
 
-  No Default       0.00      0.00      0.00     15835
-     Default       0.12      1.00      0.21      2165
+  No Default       0.99      1.00      0.99      1199
+     Default       0.97      0.94      0.95       151
 
-    accuracy                           0.12     18000
-   macro avg       0.06      0.50      0.11     18000
-weighted avg       0.01      0.12      0.03     18000
+    accuracy                           0.99      1350
+   macro avg       0.98      0.97      0.97      1350
+weighted avg       0.99      0.99      0.99      1350
 
 
 Feature Importances (top 20):
-  cashflow_volatility: 0.331171
-  essential_vs_lifestyle_ratio: 0.144923
-  avg_utility_dpd: 0.102511
-  cash_withdrawal_dependency: 0.071773
-  subscription_commitment_ratio: 0.061769
-  bounced_transaction_count: 0.059433
-  operating_cashflow_ratio: 0.047515
-  avg_invoice_payment_delay: 0.047479
-  emergency_buffer_months: 0.042339
-  eod_balance_volatility: 0.039223
-  benford_anomaly_score: 0.034001
-  rent_wallet_share: 0.017863
-  utility_payment_consistency: 0.000000
-  min_balance_violation_count: 0.000000
-  telecom_number_vintage_days: 0.000000
-  telecom_recharge_drop_ratio: 0.000000
-  academic_background_tier: 0.000000
-  purpose_of_loan_encoded: 0.000000
-  business_vintage_months: 0.000000
-  revenue_growth_trend: 0.000000
+  academic_background_tier: 0.695648
+  essential_vs_lifestyle_ratio: 0.083168
+  vendor_payment_discipline: 0.030594
+  utility_payment_consistency: 0.018297
+  avg_invoice_payment_delay: 0.011949
+  gst_filing_consistency_score: 0.009841
+  round_number_spike_ratio: 0.009554
+  business_vintage_months: 0.009485
+  emergency_buffer_months: 0.009319
+  min_balance_violation_count: 0.008943
+  eod_balance_volatility: 0.008405
+  customer_concentration_ratio: 0.008386
+  telecom_recharge_drop_ratio: 0.007880
+  revenue_seasonality_index: 0.007137
+  cash_withdrawal_dependency: 0.006864
+  operating_cashflow_ratio: 0.006819
+  repeat_customer_revenue_pct: 0.006812
+  gst_to_bank_variance: 0.006363
+  cashflow_volatility: 0.006270
+  rent_wallet_share: 0.006008

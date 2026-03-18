@@ -28,7 +28,9 @@ def flatten_aa_json(raw_json) -> pd.DataFrame:
     def find_transactions(node):
         if isinstance(node, dict):
             for k, v in node.items():
-                if k == 'Transaction' and isinstance(v, list):
+                # Setu/AA payloads commonly use `transaction` (lowercase) inside
+                # `account.transactions.transaction`, while some payloads use `Transaction`.
+                if isinstance(k, str) and k.lower() == 'transaction' and isinstance(v, list):
                     transactions.extend(v)
                 else:
                     find_transactions(v)
@@ -56,9 +58,9 @@ def flatten_aa_json(raw_json) -> pd.DataFrame:
     else:
         df['Date'] = pd.NaT
 
-    # 2. Transaction_Type (CR/DR)
+    # 2. Transaction_Type (CREDIT/DEBIT)
     if 'type' in df.columns:
-        type_mapping = {'DEBIT': 'DR', 'CREDIT': 'CR', 'DR': 'DR', 'CR': 'CR'}
+        type_mapping = {'DEBIT': 'DEBIT', 'CREDIT': 'CREDIT', 'DR': 'DEBIT', 'CR': 'CREDIT'}
         df['Transaction_Type'] = df['type'].astype(str).str.upper().map(type_mapping).fillna('UNKNOWN')
     else:
         df['Transaction_Type'] = 'UNKNOWN'

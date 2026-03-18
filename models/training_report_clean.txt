@@ -1,0 +1,59 @@
+PDR Pipeline - Layer 3 Clean Model Training Report
+=======================================================
+
+Model Path: C:\Users\kanis\OneDrive\Desktop\webseries\project\models\pdr_xgb_clean.json
+Calibration Path: C:\Users\kanis\OneDrive\Desktop\webseries\project\models\pdr_xgb_clean_calibration.json
+Feature Readiness Audit: C:\Users\kanis\OneDrive\Desktop\webseries\project\models\feature_readiness_audit_clean.json
+Features: 28
+Removed Features: ['academic_background_tier', 'operating_cashflow_survival_flag', 'turnover_inflation_spike']
+
+Metrics:
+  roc_auc: 0.9715
+  avg_precision: 0.8664
+  brier_score: 0.0357
+  n_train: 6300
+  n_val: 1350
+  n_test: 1350
+  default_rate_test: 0.1119
+  confusion_matrix: [[1186, 13], [52, 99]]
+  threshold: 0.65
+  threshold_details: {'strategy': 'f05', 'threshold': 0.65, 'f05': 0.8428805237315876}
+  precision: 0.8839
+  recall: 0.6556
+  f1: 0.7529
+  imbalance_mode: scale_pos_weight
+  calibration: platt
+  removed_features: ['academic_background_tier', 'operating_cashflow_survival_flag', 'turnover_inflation_spike']
+
+Classification Report:
+              precision    recall  f1-score   support
+
+  No Default       0.96      0.99      0.97      1199
+     Default       0.88      0.66      0.75       151
+
+    accuracy                           0.95      1350
+   macro avg       0.92      0.82      0.86      1350
+weighted avg       0.95      0.95      0.95      1350
+
+
+Feature Importances (top 20):
+  essential_vs_lifestyle_ratio: 0.287651
+  vendor_payment_discipline: 0.071673
+  avg_invoice_payment_delay: 0.053234
+  gst_filing_consistency_score: 0.044635
+  identity_device_mismatch: 0.042685
+  utility_payment_consistency: 0.037551
+  round_number_spike_ratio: 0.034286
+  emergency_buffer_months: 0.027276
+  revenue_seasonality_index: 0.024986
+  repeat_customer_revenue_pct: 0.024394
+  cashflow_volatility: 0.024120
+  eod_balance_volatility: 0.023384
+  telecom_recharge_drop_ratio: 0.021978
+  subscription_commitment_ratio: 0.021294
+  p2p_circular_loop_flag: 0.020737
+  gst_to_bank_variance: 0.020188
+  operating_cashflow_ratio: 0.020143
+  avg_utility_dpd: 0.019874
+  benford_anomaly_score: 0.019289
+  customer_concentration_ratio: 0.019204

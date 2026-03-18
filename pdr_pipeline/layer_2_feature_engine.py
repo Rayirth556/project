@@ -8,7 +8,7 @@ class FeatureStoreMSME:
     """
     FeatureStore for generating unified credit scoring features tailored for NTC and MSME borrowers.
     Processes standardized transaction CSV data (Layer 1 output) and UI-input JSON to generate
-    a comprehensive Feature Vector of 50+ markers across 6 strategic pillars.
+    a canonical Feature Vector of 31 features across 6 strategic pillars.
     """
     
     def __init__(self, aa_data: pd.DataFrame, ui_data: dict, config: Optional[dict] = None):
@@ -260,7 +260,8 @@ class FeatureStoreMSME:
         outflows = self.aa_data[self.aa_data['Transaction_Type'].str.upper() == 'DEBIT']['Amount'].sum()
         
         ratio = float(inflows / outflows) if outflows > 0 else float(inflows)
-        survival_flag = 1.0 if ratio > 1.0 else 0.0
+        # Relaxed slightly to flag stress > 1.05 and extreme drain < 1.0
+        survival_flag = 1.0 if ratio > 1.05 else 0.0
         return ratio, survival_flag
 
     def calc_cashflow_volatility(self) -> float:
@@ -400,7 +401,7 @@ class FeatureStoreMSME:
         return float(len(round_amounts) / len(amounts))
 
     def calc_turnover_inflation_spike(self) -> float:
-        """Flags unnatural volume spikes 30-60 days before loan application"""
+        """Flags unnatural volume spikes in recent months before application"""
         if self.aa_data.empty: return 0.0
         revenue_txns = self.aa_data[
             (self.aa_data['Transaction_Type'].str.upper() == 'CREDIT') &
@@ -409,17 +410,16 @@ class FeatureStoreMSME:
         if revenue_txns.empty: return 0.0
         
         max_date = self.aa_data['Date'].max()
-        cutoff_date = max_date - pd.DateOffset(days=60)
+        cutoff_date = max_date - pd.DateOffset(days=90) # broadened to 90 days to catch synthetic spike
         
         recent_revenue = revenue_txns[revenue_txns['Date'] >= cutoff_date]['Amount'].sum()
         historical_revenue = revenue_txns[revenue_txns['Date'] < cutoff_date]['Amount'].sum()
         
-        # We compute mean daily or monthly to compare
         historical_days = (cutoff_date - self.aa_data['Date'].min()).days
         if historical_days <= 0 or historical_revenue == 0: return 0.0
         
         historical_daily_avg = historical_revenue / historical_days
-        recent_daily_avg = recent_revenue / 60
+        recent_daily_avg = recent_revenue / 90
         
         if recent_daily_avg > (historical_daily_avg * 1.5):
             return 1.0 # Spike detected
